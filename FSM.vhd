@@ -56,6 +56,10 @@ begin
    	 begin
    		 case estado is
    			 when inicio =>
+			 if(bdata!=0) then
+				 p_estado <= reposo;
+			 else
+				 p_estado <= inicio;
 			 when reposo=>
    			 if(mov = "00") then --Arriba - Up
    				 p_estado <= Up;
