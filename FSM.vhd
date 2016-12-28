@@ -58,8 +58,10 @@ begin
    			 when inicio =>
 			 if(bdata!=0) then
 				 p_estado <= reposo;
+			 	SR(3 downto 2) <= "00"; --Empieza moviendose hacia arriba
 			 else
 				 p_estado <= inicio;
+		 	end if;
 			 when reposo=>
    			 if(mov = "00") then --Arriba - Up
    				 p_estado <= Up;
@@ -102,8 +104,12 @@ begin
    				 end if;
    			 when analisis=>
 				 case RS(1 downto 0) is
-					 when "00" =>
-						 p_Dserp <= Dserp - 16;
+					 when "00" => --Queremos mover arriba
+					 	if((SR(3 downto 2)="11") or (SR(3 downto 2)="00")) then --Nos estamos moviendo hacia abajo o arriba
+							p_Dserp <= Dserp;
+					 	else	--Nos movemos para la izq o derech
+						 	p_Dserp <= Dserp - 16;
+					 	end if;
 					 when "01" =>
 						 p_Dserp <= Dserp + 1;		
 					 when "10" =>
