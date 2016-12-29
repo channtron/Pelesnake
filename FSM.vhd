@@ -11,17 +11,22 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 entity FSM is
-	Port (tframe : in std_logic; --señal vsinc del vga, está a 0 un clk al refrescar terminar una pantalla	
+	Generic (CNT : integer := 26);
+	Port (
+	reset : in STD_LOGIC;
+	clk : in STD_LOGIC;
+	tframe : in STD_LOGIC; --señal vsinc del vga, está a 0 un clk al refrescar terminar una pantalla	
 	mov : in  STD_LOGIC_VECTOR (1 downto 0); --movimiento procedente del teclado
 --       	FSM_Plotter : out  STD_LOGIC_VECTOR (1 downto 0); --información que se enviará al plotter y a la musica
-       	bdir : out  STD_LOGIC_VECTOR (7 downto 0);
-       	bdata : in  STD_LOGIC_VECTOR (4 downto 0));
+       	bdir : out  STD_LOGIC_VECTOR (7 downto 0); --Bus direcciones
+       	bdata : in  STD_LOGIC_VECTOR (4 downto 0);  --Bus datos
+	rw : out STD_LOGIC); --señal de lectura/escritura
 end FSM;
 
 architecture Behavioral of FSM is
     type mi_estado is (Inicio, Reposo, Up, Down, Izq, Der,  Analisis, KO, Avanza, Sumar, OK); --estados
     signal estado,p_estado: mi_estado;
-    signal cuenta, pcuenta: unsigned; --contador
+    signal cuenta, p_cuenta: unsigned; --contador
     signal flag: std_logic; --para evitar que cuente de más
     signal Dserp,p_Dserp,Dcola,p_Dcola : unsigned(7 downto 0); --registros de direcciones
     signal p_casilla : std_logic_vector (3 downto 0); --registro para analizar las casillas
@@ -56,12 +61,12 @@ begin
    	 begin
    		 case estado is
    			 when inicio =>
-			 if(bdata!=0) then
-				 p_estado <= reposo;
+			 if(mov/=0) then
+				p_estado <= reposo;
 			 	SR(3 downto 2) <= "00"; --Empieza moviendose hacia arriba
 			 else
-				 p_estado <= inicio;
-		 	end if;
+				p_estado <= inicio;
+		 	 end if;
 			 when reposo=>
    			 if(mov = "00") then --Arriba - Up
    				 p_estado <= Up;
